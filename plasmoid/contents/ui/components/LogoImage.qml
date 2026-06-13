@@ -24,40 +24,29 @@ Item {
     property real fillScale: 1.0
     property bool editMode: false
 
-    onFillScaleChanged: {
-        if (fillScale && fillScale <= 1.0)
-            d.scale = fillScale
-        else
-            console.log("Error in LogoImage: fillScale set to " + fillScale)
-    }
+    // Expose image as a property so skins can set image.source
+    property alias image: img
 
-    QtObject {
-        id: d
-        property real scale: 1.0
-    }
-
-    implicitWidth: image.implicitWidth
-    implicitHeight: image.implicitHeight
-
-    property Image image: Image {
-        parent: root
-        anchors.centerIn: parent
-        width: parent.width * d.scale
-        height: parent.height * d.scale
+    Image {
+        id: img
+        anchors.fill: parent
         fillMode: Image.PreserveAspectFit
     }
 
-    property Item border: Rectangle {
-        parent: root.image
+    Rectangle {
+        parent: img
         anchors.fill: parent
         visible: editMode
-        border { width: 1; color: "black" }
         color: "transparent"
+        border.width: 1
+        border.color: "black"
+
         Rectangle {
             anchors.fill: parent
             anchors.margins: 1
-            border { width: 1; color: "white" }
             color: "transparent"
+            border.width: 1
+            border.color: "white"
         }
 
         Image {

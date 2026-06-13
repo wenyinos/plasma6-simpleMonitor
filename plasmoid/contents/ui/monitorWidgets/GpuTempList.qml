@@ -26,7 +26,8 @@ ListView {
     LayoutMirroring.enabled: direction === Qt.RightToLeft
     LayoutMirroring.childrenInherit: true
 
-    implicitHeight: count * 25    implicitWidth: 100
+    implicitHeight: count * 25
+    implicitWidth: 100
     interactive: false
 
     property int highTemp: 80
@@ -39,9 +40,11 @@ ListView {
 
     delegate: Item {
         id: gpuListTemp
-        implicitHeight: 25        implicitWidth: gpuLabel.implicitWidth + unitLabel.implicitWidth
+        implicitHeight: 25
+        implicitWidth: gpuLabel.implicitWidth + unitLabel.implicitWidth
         width: parent.width
-        height: (20 + indicatorHeight)        visible: showGpuTemp
+        height: (20 + indicatorHeight)
+        visible: showGpuTemp
         Text {
             id: gpuLabel
             anchors.left: parent.left
@@ -57,12 +60,15 @@ ListView {
             font.bold: true
             font.pointSize: 10
             color: "white"
+            style: Text.Outline
+            styleColor: "#80000000"
             anchors.right: parent.right
         }
 
         Rectangle {
             id: rectValue
-            height: indicatorHeight            width: Math.round(val/gpuTempList.maxTemp*parent.width)
+            height: indicatorHeight
+            width: Math.round(val/gpuTempList.maxTemp*parent.width)
             color: if (Math.round(val) >= coreTempList.criticalTemp) "red"
                    else if (Math.round(val) >= gpuTempList.highTemp) "#ffac2a"
                    else "#85a9ff"

@@ -49,18 +49,22 @@ Item {
         id: hour
         anchors.left: parent.left
         anchors.bottom: parent.bottom
-        height: 44        text: "00:"
+        height: 44
+        text: "00:"
         font {
             family: playRegular.name
             pointSize: 30
         }
         color: "white"
+        style: Text.Outline
+        styleColor: "#80000000"
     }
     Text {
         id: mins
         anchors.left: hour.right
         anchors.bottom: parent.bottom
-        height: 29        text: "00:"
+        height: 29
+        text: "00:"
         font {
             family: playRegular.name
             pointSize: 20
@@ -71,7 +75,8 @@ Item {
         id: secs
         anchors.left: mins.right
         anchors.bottom: parent.bottom
-        height: 21        text: "00"
+        height: 21
+        text: "00"
         font {
             family: playRegular.name
             pointSize: 15

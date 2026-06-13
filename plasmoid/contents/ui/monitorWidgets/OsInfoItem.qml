@@ -53,17 +53,21 @@ Item {
                       + distroVersion.substring(distroVersion.indexOf(',')+2, distroVersion.length)
                     : distroName + " " + distroVersion
             color: "white"
+            style: Text.Outline
+            styleColor: "#80000000"
 
             lineHeight: 0.6
             Layout.alignment: Qt.AlignHCenter
             horizontalAlignment: Text.AlignHCenter
             font { family: mondaRegular.name; pointSize: 9 }
         }
-        
+
         Text {
             id: kernelInfo
             text: kernelName + " " + kernelVersion
             color: "white"
+            style: Text.Outline
+            styleColor: "#80000000"
             Layout.alignment: Qt.AlignHCenter
 //            lineHeight: 0.6
             horizontalAlignment: Text.AlignHCenter

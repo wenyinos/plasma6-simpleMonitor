@@ -1,236 +1,166 @@
 /**
  * Copyright 2013-2016 Dhaby Xiloj, Konstantin Shtepa
- *
- * This file is part of plasma-simpleMonitor.
- *
- * plasma-simpleMonitor is free software: you can redistribute it
- * and/or modify it under the terms of the GNU General Public
- * License as published by the Free Software Foundation, either
- * version 3 of the License, or any later version.
- *
- * plasma-simpleMonitor is distributed in the hope that it will be
- * useful, but WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with plasma-simpleMonitor.  If not, see <http://www.gnu.org/licenses/>.
  **/
-
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls as Controls
 import org.kde.plasma.plasmoid
 import org.kde.plasma.core as PlasmaCore
-import org.kde.ksysguard.sensors as Sensors
-
-import "../code/code.js" as Code
+import org.kde.plasma.plasma5support as Plasma5Support
 
 PlasmoidItem {
     id: root
-
     preferredRepresentation: fullRepresentation
-
-    property bool atkPresent: false
-
-    Component.onCompleted: atkPresent = false
-
     property bool showGpuTemp: plasmoid.configuration.showGpuTemp
+    property var cpuLastSample: null
 
-    // 内存传感器绑定，供皮肤 delegate 读取
-    property alias memFree: memFreeSensor.value
-    property alias memTotal: memTotalSensor.value
-    property alias memUsed: memUsedSensor.value
-    property alias memBuffers: memBuffersSensor.value
-    property alias memCached: memCachedSensor.value
-    property alias swapFree: swapFreeSensor.value
-    property alias swapTotal: swapTotalSensor.value
-    property alias swapUsed: swapUsedSensor.value
-    property alias uptime: uptimeSensor.value
+    property real memFree: 0; property real memTotal: 0; property real memUsed: 0
+    property real memBuffers: 0; property real memCached: 0
+    property real swapFree: 0; property real swapTotal: 0; property real swapUsed: 0
+    property real uptime: 0
+
+    // 同步到 confEngine 供皮肤访问
+    onMemTotalChanged: confEngine.memTotal = memTotal
+    onMemFreeChanged: confEngine.memFree = memFree
+    onMemUsedChanged: confEngine.memUsed = memUsed
+    onMemBuffersChanged: confEngine.memBuffers = memBuffers
+    onMemCachedChanged: confEngine.memCached = memCached
+    onSwapTotalChanged: confEngine.swapTotal = swapTotal
+    onSwapFreeChanged: confEngine.swapFree = swapFree
+    onSwapUsedChanged: confEngine.swapUsed = swapUsed
+    onUptimeChanged: confEngine.uptime = uptime
+
+    function parseExecOutput(text) {
+        if (!text) return
+        var lines = text.split('\n')
+        var newSample = {}
+        for (var i = 0; i < lines.length; i++) {
+            var line = lines[i].trim()
+            var eq = line.indexOf('=')
+            if (eq < 0) continue
+            var key = line.substring(0, eq)
+            var val = line.substring(eq + 1)
+            if (key === "UPTIME") { root.uptime = parseFloat(val); continue }
+            if (key === "MemTotal")   { root.memTotal   = parseInt(val) * 1024; continue }
+            if (key === "MemFree")    { root.memFree    = parseInt(val) * 1024; continue }
+            if (key === "MemAvailable"){ root.memUsed  = root.memTotal - parseInt(val) * 1024; continue }
+            if (key === "Buffers")    { root.memBuffers = parseInt(val) * 1024; continue }
+            if (key === "Cached")     { root.memCached  = parseInt(val) * 1024; continue }
+            if (key === "SwapFree")   { root.swapFree   = parseInt(val) * 1024; continue }
+            if (key === "SwapTotal")  { root.swapTotal  = parseInt(val) * 1024; continue }
+            if (key === "SwapUsed")   { root.swapUsed   = parseInt(val) * 1024; continue }
+            if (key === "OS_NAME")    { confEngine.distroName = val; continue }
+            if (key === "OS_ID")      { confEngine.distroId = val; continue }
+            if (key === "OS_VERSION") { confEngine.distroVersion = val; continue }
+            if (key === "KERNEL_NAME")    { confEngine.kernelName = val; continue }
+            if (key === "KERNEL_VERSION") { confEngine.kernelVersion = val; continue }
+            // CPU cores: store idle/total for delta calculation
+            var m = key.match(/^cpu(\d+)_(idle|total)$/)
+            if (m) {
+                var num = parseInt(m[1]), field = m[2]
+                if (!newSample[num]) newSample[num] = {}
+                newSample[num][field] = parseInt(val)
+            }
+            // Thermal zones
+            var tm = key.match(/^TZ(\d+)$/)
+            if (tm) {
+                var tz = parseInt(tm[1]), tv = parseInt(val) / 1000
+                if (tv > 0 && tv < 200) {
+                    if (coreTempModel.count <= tz) coreTempModel.append({'val': tv, 'dataUnits': '°C', 'coreLabelStr': ''})
+                    else coreTempModel.set(tz, {'val': tv, 'dataUnits': '°C', 'coreLabelStr': ''})
+                }
+            }
+            // HWMon (GPU)
+            var hm = key.match(/^HW_(.+)_(\d+)$/)
+            if (hm && hm[1].search(/gpu|amdgpu|radeon|nvidia/i) >= 0 && hm[2] === "1") {
+                var hv = parseInt(val) / 1000
+                if (hv > 0 && !isNaN(hv)) {
+                    if (gpuTempModel.count === 0) gpuTempModel.append({'val': hv, 'dataUnits': '°C', 'gpuLabelStr': 'GPU'})
+                    else gpuTempModel.set(0, {'val': hv, 'dataUnits': '°C', 'gpuLabelStr': 'GPU'})
+                }
+            }
+        }
+        // Compute CPU deltas
+        if (root.cpuLastSample) {
+            for (var n in newSample) {
+                if (!newSample.hasOwnProperty(n)) continue
+                var cur = newSample[n], prev = root.cpuLastSample[n]
+                if (!cur.idle || !cur.total || !prev) continue
+                var dT = cur.total - prev.total, dI = cur.idle - prev.idle
+                if (dT > 0) {
+                    var usage = Math.round((dT - dI) / dT * 100)
+                    if (cpuModel.count <= n) cpuModel.append({'val': usage})
+                    else cpuModel.set(n, {'val': usage})
+                }
+            }
+        }
+        root.cpuLastSample = newSample
+        root.swapUsed = root.swapTotal - root.swapFree
+    }
+
+    Plasma5Support.DataSource {
+        id: execDs
+        engine: "executable"
+        connectedSources: ["bash " + String(Qt.resolvedUrl("../code/data.sh")).replace("file://", "")]
+        interval: confEngine.updateInterval * 1000
+        onNewData: function(sourceName, data) {
+            var out = data["stdout"] || ""
+            parseExecOutput(String(out))
+        }
+    }
 
     QtObject {
         id: confEngine
-
-        property int skin:              plasmoid.configuration.skin
-        property int bgColor:           plasmoid.configuration.bgColor
-        property int logo:              plasmoid.configuration.logo
-        property bool showGpuTemp:      plasmoid.configuration.showGpuTemp
-        property bool showSwap:         plasmoid.configuration.showSwap
-        property bool showUptime:       plasmoid.configuration.showUptime
-        property int tempUnit:          plasmoid.configuration.tempUnit
-        property int cpuHighTemp:       plasmoid.configuration.cpuHighTemp
-        property int cpuCritTemp:       plasmoid.configuration.cpuCritTemp
-        property bool coloredCpuLoad:   plasmoid.configuration.coloredCpuLoad
-        property bool flatCpuLoad:      plasmoid.configuration.flatCpuLoad
-        property int indicatorHeight:   plasmoid.configuration.indicatorHeight
+        property int skin: plasmoid.configuration.skin
+        property int bgColor: plasmoid.configuration.bgColor
+        property int logo: plasmoid.configuration.logo
+        property bool showGpuTemp: plasmoid.configuration.showGpuTemp
+        property bool showSwap: plasmoid.configuration.showSwap
+        property bool showUptime: plasmoid.configuration.showUptime
+        property int tempUnit: plasmoid.configuration.tempUnit
+        property int cpuHighTemp: plasmoid.configuration.cpuHighTemp
+        property int cpuCritTemp: plasmoid.configuration.cpuCritTemp
+        property bool coloredCpuLoad: plasmoid.configuration.coloredCpuLoad
+        property bool flatCpuLoad: plasmoid.configuration.flatCpuLoad
+        property int indicatorHeight: plasmoid.configuration.indicatorHeight
         property double updateInterval: plasmoid.configuration.updateInterval
-
-        property string distroName: "tux"
-        property string distroId: "tux"
-        property string distroVersion: ""
-        property string kernelName: ""
-        property string kernelVersion: ""
-
+        property string distroName: "tux"; property string distroId: "tux"
+        property string distroVersion: ""; property string kernelName: ""; property string kernelVersion: ""
         property int direction: Qt.LeftToRight
-
-        Component.onCompleted: {
-            Code.getDistroInfo(function(info) {
-                distroName = info['name']
-                distroId = info['id']
-                distroVersion = info['version']
-            }, this);
-
-            Code.getKernelInfo(function(info){
-                kernelName = info['name']
-                kernelVersion = info['version']
-            }, this);
-        }
+        // 系统数据（供皮肤访问）
+        property real memFree: 0; property real memTotal: 0; property real memUsed: 0
+        property real memBuffers: 0; property real memCached: 0
+        property real swapFree: 0; property real swapTotal: 0; property real swapUsed: 0
+        property real uptime: 0
     }
 
-    ListModel {
-        id: cpuModel
-
-        function getAll() {
-            let list = [];
-            for(let i=0; i < cpuModel.count; i++) {
-                list.push(cpuModel.get(i));
-            }
-            return list;
-        }
-    }
-
-    ListModel {
-        id: coreTempModel
-
-        function getAll() {
-            let list = [];
-            for(let i=0; i < coreTempModel.count; i++) {
-                list.push(coreTempModel.get(i));
-            }
-            return list;
-        }
-    }
-
-    ListModel {
-        id: gpuTempModel
-    }
-
-    // === KSystemStats 传感器 ===
-
-    // CPU 负载（每核）
-    Repeater {
-        id: cpuSensorsRepeater
-        model: 128
-        Sensors.Sensor {
-            sensorId: "cpu/cpu" + index + "/usage"
-            onValueChanged: {
-                if (value >= 0) {
-                    if (cpuModel.count <= index)
-                        cpuModel.append({'val': value});
-                    else
-                        cpuModel.set(index, {'val': value});
-                }
-            }
-        }
-    }
-
-    // CPU 温度（每核）
-    Repeater {
-        id: coreTempSensorsRepeater
-        model: 128
-        Sensors.Sensor {
-            sensorId: "cpu/cpu" + index + "/temperature"
-            onValueChanged: {
-                if (value > 0) {
-                    if (coreTempModel.count <= index)
-                        coreTempModel.append({'val': value, 'dataUnits': '°C', 'coreLabelStr': ''});
-                    else
-                        coreTempModel.set(index, {'val': value, 'dataUnits': '°C', 'coreLabelStr': ''});
-                }
-            }
-        }
-    }
-
-    // 内存传感器
-    Sensors.Sensor { id: memFreeSensor;    sensorId: "memory/physical/free" }
-    Sensors.Sensor { id: memTotalSensor;   sensorId: "memory/physical/total" }
-    Sensors.Sensor { id: memUsedSensor;    sensorId: "memory/physical/used" }
-    Sensors.Sensor { id: memBuffersSensor; sensorId: "memory/physical/buffers" }
-    Sensors.Sensor { id: memCachedSensor;  sensorId: "memory/physical/cached" }
-    Sensors.Sensor { id: swapFreeSensor;   sensorId: "memory/swap/free" }
-    Sensors.Sensor { id: swapTotalSensor;  sensorId: "memory/swap/total" }
-    Sensors.Sensor { id: swapUsedSensor;   sensorId: "memory/swap/used" }
-
-    // 运行时间
-    Sensors.Sensor { id: uptimeSensor; sensorId: "system/uptime" }
-
-    // GPU 温度（KSystemStats 原生传感器）
-    Sensors.Sensor {
-        id: gpuTempSensor
-        sensorId: "gpu/gpu0/temperature"
-        enabled: showGpuTemp
-        onValueChanged: {
-            if (value > 0) {
-                if (gpuTempModel.count === 0)
-                    gpuTempModel.append({'val': value, 'dataUnits': '°C', 'gpuLabelStr': 'GPU'});
-                else
-                    gpuTempModel.set(0, {'val': value, 'dataUnits': '°C', 'gpuLabelStr': 'GPU'});
-            }
-        }
-    }
+    ListModel { id: cpuModel }
+    ListModel { id: coreTempModel }
+    ListModel { id: gpuTempModel }
 
     fullRepresentation: Item {
         id: rep
-
-        Layout.minimumWidth: loader.implicitWidth
-        Layout.minimumHeight: loader.implicitHeight
+        Layout.minimumWidth: 50
+        Layout.minimumHeight: 50
         Layout.preferredWidth: loader.implicitWidth
         Layout.preferredHeight: loader.implicitHeight
-
         Rectangle {
-            id: repBg
-            anchors.fill: parent
-            color: "black"
-
-            Loader {
-                id: loader
-                anchors.fill: parent
-                source: "skins/DefaultSkin.qml"
-            }
+            id: repBg; anchors.fill: parent; color: "black"
+            Loader { id: loader; anchors.fill: parent; source: "skins/DefaultSkin.qml" }
         }
-
         Connections {
             target: confEngine
             function onSkinChanged() {
-                switch (confEngine.skin) {
-                default:
-                case 0: loader.source = "skins/DefaultSkin.qml"; break;
-                case 1: loader.source = "skins/ColumnSkin.qml"; break;
-                case 2: loader.source = "skins/MinimalisticSkin.qml"; break;
-                }
+                switch(confEngine.skin){ default:case 0:loader.source="skins/DefaultSkin.qml";break;case 1:loader.source="skins/ColumnSkin.qml";break;case 2:loader.source="skins/MinimalisticSkin.qml";break }
             }
             function onBgColorChanged() {
-                switch (confEngine.bgColor) {
-                default:
-                case 0:
-                    repBg.color = "black";
-                    root.Plasmoid.backgroundHints = PlasmaCore.Types.StandardBackground;
-                    break;
-                case 1:
-                    repBg.color = "transparent";
-                    root.Plasmoid.backgroundHints = PlasmaCore.Types.NoBackground;
-                    break;
-                case 2:
-                    repBg.color = "transparent";
-                    root.Plasmoid.backgroundHints = PlasmaCore.Types.TranslucentBackground;
-                    break;
+                switch(confEngine.bgColor){
+                default:case 0:repBg.color="black";root.Plasmoid.backgroundHints=PlasmaCore.Types.StandardBackground;break
+                case 1:repBg.color="transparent";root.Plasmoid.backgroundHints=PlasmaCore.Types.NoBackground;break
+                case 2:repBg.color="transparent";root.Plasmoid.backgroundHints=PlasmaCore.Types.TranslucentBackground;break
                 }
             }
         }
-
-        Component.onCompleted: {
-            confEngine.skinChanged();
-            confEngine.bgColorChanged();
-        }
+        Component.onCompleted: { confEngine.skinChanged(); confEngine.bgColorChanged() }
     }
 }

@@ -20,22 +20,12 @@
 import QtQuick
 import QtQuick.Controls as Controls
 import QtQuick.Layouts
+import org.kde.kcmutils as KCM
 
 import "../../code/code.js" as Code
 
-Item {
+KCM.SimpleKCM {
     id: root
-
-    Layout.fillHeight: true
-    Layout.fillWidth: true
-
-    implicitHeight: settingsLayout.implicitHeight
-    implicitWidth: settingsLayout.implicitWidth
-
-    Layout.minimumWidth: implicitWidth
-    Layout.minimumHeight: implicitHeight
-    Layout.preferredWidth: implicitWidth
-    Layout.preferredHeight: implicitHeight
 
     property alias cfg_skin: skinComboBox.currentIndex
 
@@ -47,7 +37,7 @@ Item {
         Row {
             spacing: 3
 
-            Label {
+            Controls.Label {
                 text: i18n("Skin:")
                 anchors.verticalCenter: skinComboBox.verticalCenter
             }
@@ -75,7 +65,7 @@ Item {
             }
         }
 
-        Label {
+        Controls.Label {
             text: i18n("Preview:")
         }
 

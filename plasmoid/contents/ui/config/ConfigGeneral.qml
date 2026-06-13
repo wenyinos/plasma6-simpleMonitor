@@ -21,22 +21,12 @@ import QtQuick
 import QtQuick.Controls as Controls
 import QtQuick.Layouts
 import org.kde.kirigami as Kirigami
+import org.kde.kcmutils as KCM
 
 import "../../code/code.js" as Code
 
-Item {
+KCM.SimpleKCM {
     id: root
-
-    Layout.fillHeight: true
-    Layout.fillWidth: true
-
-    implicitHeight: settingsLayout.implicitHeight
-    implicitWidth: settingsLayout.implicitWidth
-
-    Layout.minimumWidth: implicitWidth
-    Layout.minimumHeight: implicitHeight
-    Layout.preferredWidth: implicitWidth
-    Layout.preferredHeight: implicitHeight
 
     property int cfg_bgColor
     property alias cfg_logo: logoComboBox.currentIndex
@@ -46,6 +36,9 @@ Item {
     property int cfg_tempUnit
     property alias cfg_cpuHighTemp: cpuHighTempSpinBox.value
     property alias cfg_cpuCritTemp: cpuCritTempSpinBox.value
+    // KCM 框架注入的其他页面配置属性（忽略）
+    property double cfg_updateInterval
+    property double cfg_updateIntervalDefault
 
     QtObject {
         id: d
@@ -61,16 +54,16 @@ Item {
 
     onCfg_bgColorChanged: {
         switch (cfg_bgColor) {
-        default: case 0: bgColorTypeGroup.current = standardBgColor; break;
-        case 1: bgColorTypeGroup.current = crystalBgColor; break;
-        case 2: bgColorTypeGroup.current = translucentBgColor; break;
+        default: case 0: bgColorTypeGroup.checkedButton = standardBgColor; break;
+        case 1: bgColorTypeGroup.checkedButton = crystalBgColor; break;
+        case 2: bgColorTypeGroup.checkedButton = translucentBgColor; break;
         }
     }
 
     onCfg_tempUnitChanged: {
         switch (cfg_tempUnit) {
-        default: case 0: tempUnitTypeGroup.current = celsiusTemp; break;
-        case 1: tempUnitTypeGroup.current = fahrenheitTemp; break;
+        default: case 0: tempUnitTypeGroup.checkedButton = celsiusTemp; break;
+        case 1: tempUnitTypeGroup.checkedButton = fahrenheitTemp; break;
         }
     }
 
@@ -91,21 +84,21 @@ Item {
         id: settingsLayout
         anchors.fill: parent
 
-        GroupBox {
+        Controls.GroupBox {
             title: i18n("Display settings:")
             Layout.fillWidth: true
 
             GridLayout {
                 columns: 2
 
-                Label {
+                Controls.Label {
                     text: i18n("Logo:")
                     Layout.alignment: Qt.AlignRight
                     Layout.row: 0
                     Layout.column: 0
                 }
 
-                ComboBox {
+                Controls.ComboBox {
                     id: logoComboBox
                     model: [i18n("Default"), i18n("Tux"), i18n("Slackware"), i18n("Ubuntu"), i18n("Kubuntu"), i18n("OpenSUSE"), i18n("Manjaro"), i18n("Arch"), i18n("Fedora")]
                     Layout.row: 0
@@ -123,7 +116,7 @@ Item {
                     implicitWidth:  logoComboBox.width + 10
 
                     color: "transparent"
-                    border { width: 1; color: Kirigami.Theme.buttonTextColor }
+                    border { width: 1; color: Kirigami.Theme.textColor }
                     radius: 2
 
                     Image {
@@ -136,14 +129,14 @@ Item {
                     }
                 }
 
-                Label {
+                Controls.Label {
                     text: i18n("Background color:")
                     Layout.alignment: Qt.AlignRight
                     Layout.row: 2
                     Layout.column: 0
                 }
 
-                RadioButton {
+                Controls.RadioButton {
                     id: standardBgColor
                     Controls.ButtonGroup.group: bgColorTypeGroup
                     text: i18n("Standard")
@@ -152,7 +145,7 @@ Item {
                     Layout.column: 1
                 }
 
-                RadioButton {
+                Controls.RadioButton {
                     id: crystalBgColor
                     Controls.ButtonGroup.group: bgColorTypeGroup
                     text: i18n("Crystal")
@@ -161,7 +154,7 @@ Item {
                     Layout.column: 1
                 }
 
-                RadioButton {
+                Controls.RadioButton {
                     id: translucentBgColor
                     Controls.ButtonGroup.group: bgColorTypeGroup
                     text: i18n("Translucent")
@@ -170,28 +163,28 @@ Item {
                     Layout.column: 1
                 }
 
-                Label {
+                Controls.Label {
                     text: i18n("Show:")
                     Layout.alignment: Qt.AlignRight
                     Layout.row: 5
                     Layout.column: 0
                 }
 
-                CheckBox {
+                Controls.CheckBox {
                     id: showGpuTempCheckBox
                     text: i18n("GPU Temperature")
                     Layout.row: 5
                     Layout.column: 1
                 }
 
-                CheckBox {
+                Controls.CheckBox {
                     id: showSwapCheckBox
                     text: i18n("Swap")
                     Layout.row: 6
                     Layout.column: 1
                 }
 
-                CheckBox {
+                Controls.CheckBox {
                     id: showUptimeCheckBox
                     text: i18n("Uptime")
                     Layout.row: 7
@@ -200,7 +193,7 @@ Item {
             }
         }
 
-        GroupBox {
+        Controls.GroupBox {
             title: i18n("Temperature settings:")
             Layout.fillWidth: true
 
@@ -208,7 +201,7 @@ Item {
                 columns: 3
                 rowSpacing: 2
 
-                Label {
+                Controls.Label {
                     Layout.row: 0
                     Layout.column: 0
                     Layout.columnSpan: 3
@@ -217,14 +210,14 @@ Item {
                     wrapMode: Text.WordWrap
                 }
 
-                Label {
+                Controls.Label {
                     text: i18n("Temperature units:")
                     Layout.alignment: Qt.AlignRight
                     Layout.row: 1
                     Layout.column: 0
                 }
 
-                RadioButton {
+                Controls.RadioButton {
                     id: celsiusTemp
                     Controls.ButtonGroup.group: tempUnitTypeGroup
                     text: i18n("Celsius °C")
@@ -233,7 +226,7 @@ Item {
                     Layout.column: 1
                 }
 
-                RadioButton {
+                Controls.RadioButton {
                     id: fahrenheitTemp
                     Controls.ButtonGroup.group: tempUnitTypeGroup
                     text: i18n("Fahrenheit °F")
@@ -242,27 +235,27 @@ Item {
                     Layout.column: 1
                 }
 
-                Label {
+                Controls.Label {
                     text: i18n("CPU High Temperature:")
                     Layout.alignment: Qt.AlignRight
                     Layout.row: 3
                     Layout.column: 0
                 }
 
-                SpinBox {
+                Controls.SpinBox {
                     id: cpuHighTempSpinBox
                     Layout.row: 3
                     Layout.column: 1
                 }
 
-                Label {
+                Controls.Label {
                     text: i18n("CPU Critical Temperature:")
                     Layout.alignment: Qt.AlignRight
                     Layout.row: 4
                     Layout.column: 0
                 }
 
-                SpinBox {
+                Controls.SpinBox {
                     id: cpuCritTempSpinBox
                     to: 150
                     Layout.row: 4

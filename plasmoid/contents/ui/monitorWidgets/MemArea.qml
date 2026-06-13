@@ -39,25 +39,30 @@ Item {
     ColumnLayout {
         id: memColumn
 
-        spacing: 2        anchors.fill: parent
+        spacing: 2
+        anchors.fill: parent
 
         RowLayout {
-            spacing: 3            Text {
+            spacing: 3
+            Text {
                 id: memType
                 text: i18n("Mem:")
                 font { family: doppioOneRegular.name; pointSize: 12 }
                 color: "#ffdd55"
             }
             Text {
-                text: i18n("%1 GiB", memTotal.toFixed(2))
+                text: i18n("%1 GiB", (memTotal / 1073741824).toFixed(2))
                 font { family: doppioOneRegular.name; pointSize: 12 }
                 color: "white"
+                style: Text.Outline
+                styleColor: "#80000000"
             }
         }
 
         RowLayout {
             id: memoryInfoLabels
-            spacing: 3            property int fontSize : 8
+            spacing: 3
+            property int fontSize : 8
             Text {
                 text: i18n("Used:")
                 color: "red"
@@ -65,8 +70,10 @@ Item {
             }
             Text {
                 id: memUsedText
-                text: i18n("%1 GiB", (memUsed-(memBuffers+memCached)).toFixed(2))
+                text: i18n("%1 GiB", ((memUsed-(memBuffers+memCached)) / 1073741824).toFixed(2))
                 color: "white"
+                style: Text.Outline
+                styleColor: "#80000000"
                 font.pointSize: memoryInfoLabels.fontSize
             }
             Text {
@@ -76,15 +83,18 @@ Item {
             }
             Text {
                 id: memFreeText
-                text: i18n("%1 GiB", (memFree+(memBuffers+memCached)).toFixed(2))
+                text: i18n("%1 GiB", ((memFree+(memBuffers+memCached)) / 1073741824).toFixed(2))
                 color: "white"
+                style: Text.Outline
+                styleColor: "#80000000"
                 font.pointSize: memoryInfoLabels.fontSize
             }
         }
 
         Rectangle {
             id: rectTotalMemory
-            height: 7            Layout.fillWidth: true
+            height: 7
+            Layout.fillWidth: true
             color: "#7ec264"
             Rectangle {
                 id: rectUsedMemory

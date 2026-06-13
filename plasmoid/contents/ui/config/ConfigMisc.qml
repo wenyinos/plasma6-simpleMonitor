@@ -20,20 +20,10 @@
 import QtQuick
 import QtQuick.Controls as Controls
 import QtQuick.Layouts
+import org.kde.kcmutils as KCM
 
-Item {
+KCM.SimpleKCM {
     id: root
-
-    Layout.fillHeight: true
-    Layout.fillWidth: true
-
-    implicitHeight: settingsLayout.implicitHeight
-    implicitWidth: settingsLayout.implicitWidth
-
-    Layout.minimumWidth: implicitWidth
-    Layout.minimumHeight: implicitHeight
-    Layout.preferredWidth: implicitWidth
-    Layout.preferredHeight: implicitHeight
 
     property alias cfg_coloredCpuLoad: coloredCpuLoadCheckBox.checked
     property alias cfg_flatCpuLoad: flatCpuLoadCheckBox.checked
@@ -44,35 +34,35 @@ Item {
         id: settingsLayout
         anchors.fill: parent
 
-        GroupBox {
+        Controls.GroupBox {
             title: i18n("Style settings:")
             Layout.fillWidth: true
 
             GridLayout {
                 columns: 2
 
-                Label {
+                Controls.Label {
                     text: i18n("CPU load indicator style:")
                     Layout.alignment: Qt.AlignRight
                     Layout.row: 0
                     Layout.column: 0
                 }
 
-                CheckBox {
+                Controls.CheckBox {
                     id: coloredCpuLoadCheckBox
                     text: i18n("Colored")
                     Layout.row: 0
                     Layout.column: 1
                 }
 
-                CheckBox {
+                Controls.CheckBox {
                     id: flatCpuLoadCheckBox
                     text: i18n("Flat")
                     Layout.row: 1
                     Layout.column: 1
                 }
 
-                SpinBox {
+                Controls.SpinBox {
                     id: indicatorHeightSpinBox
                     from: 1
                     to: 99
@@ -80,7 +70,7 @@ Item {
                     Layout.column: 1
                 }
 
-                Label {
+                Controls.Label {
                     text: i18n("CPU load indicator height:")
                     Layout.alignment: Qt.AlignRight
                     Layout.row: 2
@@ -89,14 +79,14 @@ Item {
             }
         }
 
-        GroupBox {
+        Controls.GroupBox {
             title: i18n("Performance settings:")
             Layout.fillWidth: true
 
             GridLayout {
                 columns: 3
 
-                Label {
+                Controls.Label {
                     text: i18n('Update interval:')
                     Layout.alignment: Qt.AlignRight
                 }
@@ -110,7 +100,7 @@ Item {
                     Layout.fillWidth: true
                 }
 
-                Label {
+                Controls.Label {
                     text: i18n("%1 s", updateIntervalSlider.value.toFixed(1))
                 }
             }

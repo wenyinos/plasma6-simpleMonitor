@@ -39,17 +39,17 @@ Item {
     property string kernelName:     confEngine.kernelName
     property string kernelVersion:  confEngine.kernelVersion
 
-    property double memFree
-    property double memTotal
-    property double memUsed
-    property double memBuffers
-    property double memCached
+    property double memFree:      confEngine.memFree
+    property double memTotal:     confEngine.memTotal
+    property double memUsed:      confEngine.memUsed
+    property double memBuffers:   confEngine.memBuffers
+    property double memCached:    confEngine.memCached
 
-    property double swapFree
-    property double swapTotal
-    property double swapUsed
+    property double swapFree:     confEngine.swapFree
+    property double swapTotal:    confEngine.swapTotal
+    property double swapUsed:     confEngine.swapUsed
 
-    property int uptime
+    property double uptime:       confEngine.uptime
 
     property int direction: confEngine.direction
     LayoutMirroring.enabled: direction === Qt.RightToLeft

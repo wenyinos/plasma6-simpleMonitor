@@ -52,6 +52,8 @@ ColumnLayout {
         text: i18n("mie")
         font.pointSize: 14
         color: "white"
+        style: Text.Outline
+        styleColor: "#80000000"
         font.capitalization: Font.AllLowercase
         Layout.bottomMargin: -20
     }
@@ -61,7 +63,8 @@ ColumnLayout {
 
         Text {
             id: dayNumber
-//            height: 65
+//
+height: 65
             text: "25"
             font {
                 family: michroma.name
@@ -79,6 +82,8 @@ ColumnLayout {
                 pointSize: 16
             }
             color: "white"
+            style: Text.Outline
+            styleColor: "#80000000"
         }
     }
 }

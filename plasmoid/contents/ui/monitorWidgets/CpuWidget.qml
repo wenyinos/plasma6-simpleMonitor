@@ -28,7 +28,8 @@ ListView {
 
     property color progressColor: "#993de515"
     
-    implicitWidth: 100    implicitHeight: childrenRect.height
+    implicitWidth: 100
+    implicitHeight: childrenRect.height
 
     model: cpuModel
     interactive: false
@@ -49,9 +50,10 @@ ListView {
         Column {
             id: cpuListItem
             width: parent.width
-            height: (20 + indicatorHeight)            Row {
-                spacing: 0
-                spacing: 5                anchors.left: parent.left
+            height: (20 + indicatorHeight)
+            Row {
+                spacing: 5
+                anchors.left: parent.left
                 Text {
                     id: cpuLabel
                     text: i18n('CPU %1:', model.index)
@@ -70,6 +72,8 @@ ListView {
                     font.bold: true
                     font.pointSize: 10
                     color: "white"
+                    style: Text.Outline
+                    styleColor: "#80000000"
                 }
             }
             Item {
@@ -163,7 +167,10 @@ ListView {
                     }
                 }
                 Rectangle {
-                    height: progressBar.height + 4                    width: 5                    radius: 2                    anchors.left: rectValue.right
+                    height: progressBar.height + 4
+                    width: 5
+                    radius: 2
+                    anchors.left: rectValue.right
                     anchors.verticalCenter: parent.verticalCenter
                     color: "#88ffffff"
                     visible: !flatCpuLoad

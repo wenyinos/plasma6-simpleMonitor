@@ -26,7 +26,8 @@ ListView {
     LayoutMirroring.enabled: direction === Qt.RightToLeft
     LayoutMirroring.childrenInherit: true
 
-    implicitHeight: count * 25    implicitWidth: 100
+    implicitHeight: count * 25
+    implicitWidth: 100
     interactive: false
 
     property int highTemp: 80
@@ -39,9 +40,11 @@ ListView {
 
     delegate: Item {
         id: coreListTemp
-        implicitHeight: 25        implicitWidth: coreLabel.implicitWidth + unitLabel.implicitWidth
+        implicitHeight: 25
+        implicitWidth: coreLabel.implicitWidth + unitLabel.implicitWidth
         width: parent.width
-        height: (20 + indicatorHeight)        Text {
+        height: (20 + indicatorHeight)
+        Text {
             id: coreLabel
             anchors.left: parent.left
             text: if (coreLabelStr == "") i18n('CPU %1:', model.index); else i18n(coreLabelStr)
@@ -56,12 +59,15 @@ ListView {
             font.bold: true
             font.pointSize: 10
             color: "white"
+            style: Text.Outline
+            styleColor: "#80000000"
             anchors.right: parent.right
         }
 
         Rectangle {
             id: rectValue
-            height: 11            width: Math.floor(val/coreTempList.criticalTemp*parent.width)
+            height: 11
+            width: Math.floor(val/coreTempList.criticalTemp*parent.width)
             color: if (val >= coreTempList.criticalTemp) "red"
                    else if (val >= coreTempList.highTemp) "#ffac2a"
                    else "#85a9ff"

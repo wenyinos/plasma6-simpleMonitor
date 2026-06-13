@@ -41,5 +41,7 @@ Row {
         id: uptimeLabel
         text: i18n("%1d %2:%3", d.days, d.hours, ((d.minutes < 10) ? '0' : '') + d.minutes)
         color: "white"
+        style: Text.Outline
+        styleColor: "#80000000"
     }
 }
