@@ -21,28 +21,15 @@ import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls as Controls
 import org.kde.plasma.plasmoid
-import org.kde.plasma.extras as PlasmaExtras
+import org.kde.plasma.core as PlasmaCore
 import org.kde.ksysguard.sensors as Sensors
 
 import "../code/code.js" as Code
 
-Rectangle {
+PlasmoidItem {
     id: root
 
-    width: implicitWidth
-    height: implicitHeight
-
-    implicitWidth: loader.implicitWidth
-    implicitHeight: loader.implicitHeight
-
-    Layout.minimumWidth: implicitWidth
-    Layout.minimumHeight: implicitHeight
-    Layout.preferredWidth: implicitWidth
-    Layout.preferredHeight: implicitHeight
-
-    Plasmoid.preferredRepresentation: Plasmoid.fullRepresentation
-
-    color: "black"
+    preferredRepresentation: fullRepresentation
 
     property bool atkPresent: false
 
@@ -85,51 +72,6 @@ Rectangle {
         property string kernelVersion: ""
 
         property int direction: Qt.LeftToRight
-
-        onSkinChanged: {
-            switch (skin) {
-            default:
-            case 0:
-                loader.source = "skins/DefaultSkin.qml";
-                root.Layout.maximumWidth = root.Layout.preferredWidth;
-                root.Layout.maximumHeight = root.Layout.preferredHeight;
-                root.Layout.maximumWidth = Number.POSITIVE_INFINITY;
-                root.Layout.maximumHeight = Number.POSITIVE_INFINITY;
-                break;
-            case 1:
-                loader.source = "skins/ColumnSkin.qml"
-                root.Layout.maximumWidth = root.Layout.preferredWidth;
-                root.Layout.maximumHeight = root.Layout.preferredHeight;
-                root.Layout.maximumWidth = Number.POSITIVE_INFINITY;
-                root.Layout.maximumHeight = Number.POSITIVE_INFINITY;
-                break;
-            case 2:
-                loader.source = "skins/MinimalisticSkin.qml"
-                root.Layout.maximumWidth = root.Layout.preferredWidth;
-                root.Layout.maximumHeight = root.Layout.preferredHeight;
-                root.Layout.maximumWidth = Number.POSITIVE_INFINITY;
-                root.Layout.maximumHeight = Number.POSITIVE_INFINITY;
-                break;
-            }
-        }
-
-        onBgColorChanged: {
-            switch (bgColor) {
-            default:
-            case 0:
-                root.color = "black";
-                Plasmoid.backgroundHints = PlasmaTypes.StandardBackground;
-                break;
-            case 1:
-                root.color = "transparent";
-                Plasmoid.backgroundHints = PlasmaTypes.NoBackground;
-                break;
-            case 2:
-                root.color = "transparent";
-                Plasmoid.backgroundHints = PlasmaTypes.TranslucentBackground;
-                break;
-            }
-        }
 
         Component.onCompleted: {
             Code.getDistroInfo(function(info) {
@@ -237,35 +179,58 @@ Rectangle {
         }
     }
 
-    // GPU 温度回退：KSystemStats 无传感器时，通过 nvidia-smi 命令获取
-    PlasmaExtras.CommandRunner {
-        id: nvidiaCmd
-        running: false
-        sourceCommand: "nvidia-smi --query-gpu=temperature.gpu --format=csv,noheader"
+    fullRepresentation: Item {
+        id: rep
 
-        onExited: function(exitCode, exitStatus, stdout, stderr) {
-            if (exitCode !== 0 || stdout.trim() === "")
-                return;
-            var temperature = parseFloat(stdout.trim());
-            if (isNaN(temperature))
-                return;
-            if (gpuTempModel.count === 0)
-                gpuTempModel.append({'val': temperature, 'dataUnits': '°C', 'gpuLabelStr': 'NVIDIA GPU'});
-            else
-                gpuTempModel.set(0, {'val': temperature, 'dataUnits': '°C', 'gpuLabelStr': 'NVIDIA GPU'});
+        Layout.minimumWidth: loader.implicitWidth
+        Layout.minimumHeight: loader.implicitHeight
+        Layout.preferredWidth: loader.implicitWidth
+        Layout.preferredHeight: loader.implicitHeight
+
+        Rectangle {
+            id: repBg
+            anchors.fill: parent
+            color: "black"
+
+            Loader {
+                id: loader
+                anchors.fill: parent
+                source: "skins/DefaultSkin.qml"
+            }
         }
-    }
 
-    Timer {
-        interval: plasmoid.configuration.updateInterval * 1000
-        running: showGpuTemp
-        repeat: true
-        onTriggered: nvidiaCmd.exec()
-    }
+        Connections {
+            target: confEngine
+            function onSkinChanged() {
+                switch (confEngine.skin) {
+                default:
+                case 0: loader.source = "skins/DefaultSkin.qml"; break;
+                case 1: loader.source = "skins/ColumnSkin.qml"; break;
+                case 2: loader.source = "skins/MinimalisticSkin.qml"; break;
+                }
+            }
+            function onBgColorChanged() {
+                switch (confEngine.bgColor) {
+                default:
+                case 0:
+                    repBg.color = "black";
+                    root.Plasmoid.backgroundHints = PlasmaCore.Types.StandardBackground;
+                    break;
+                case 1:
+                    repBg.color = "transparent";
+                    root.Plasmoid.backgroundHints = PlasmaCore.Types.NoBackground;
+                    break;
+                case 2:
+                    repBg.color = "transparent";
+                    root.Plasmoid.backgroundHints = PlasmaCore.Types.TranslucentBackground;
+                    break;
+                }
+            }
+        }
 
-    Loader {
-        id: loader
-        anchors.fill: parent
-        source: "skins/DefaultSkin.qml"
+        Component.onCompleted: {
+            confEngine.skinChanged();
+            confEngine.bgColorChanged();
+        }
     }
 }

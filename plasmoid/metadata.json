@@ -29,9 +29,6 @@
         "FormFactors": ["tablet", "mediacenter", "desktop"],
         "EnabledByDefault": true
     },
-    "X-Plasma-API": "declarativeappletscript",
-    "X-Plasma-MainScript": "ui/main.qml",
-    "X-Plasma-StandAloneApp": true,
-    "X-Plasma-Requires-FileDialog": "Unused",
-    "X-Plasma-Requires-LaunchApp": "Unused"
+    "KPackageStructure": "Plasma/Applet",
+    "X-Plasma-MainScript": "ui/main.qml"
 }
