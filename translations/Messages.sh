@@ -5,8 +5,8 @@
 cd "${0%/*}"
 DIR=$(pwd)
 
-NAME="plasma_applet_"$(grep "X-KDE-PluginInfo-Name" ../plasmoid/metadata.desktop | sed 's/.*=//')
-VERSION=$(grep "X-KDE-PluginInfo-Version" ../plasmoid/metadata.desktop | sed 's/.*=//')
+NAME="plasma_applet_"$(sed -n 's/.*"Id"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' ../plasmoid/metadata.json | head -1)
+VERSION=$(sed -n 's/.*"Version"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' ../plasmoid/metadata.json | head -1)
 
 XGETTEXT="xgettext --from-code=UTF-8 -kde -ci18n -ki18n:1 -ki18nc:1c,2 -ki18np:1,2 \
           -ki18ncp:1c,2,3 -ktr2i18n:1 -kI18N_NOOP:1 -kI18N_NOOP2:1c,2 -kaliasLocale \

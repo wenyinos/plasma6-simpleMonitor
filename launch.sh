@@ -1,4 +1,4 @@
 #!/bin/sh
 
 cd "${0%/*}"
-plasmoidviewer -f planar -a plasmoid/
+plasmoidviewer6 -f planar -a plasmoid/

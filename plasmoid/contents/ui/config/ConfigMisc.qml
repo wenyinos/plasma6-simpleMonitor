@@ -17,12 +17,9 @@
  * along with plasma-simpleMonitor.  If not, see <http://www.gnu.org/licenses/>.
  **/
 
-import QtQuick 2.0
-import QtQuick.Controls 1.0
-import QtQuick.Layouts 1.1
-import org.kde.plasma.core 2.0 as PlasmaCore
-
-import "../../code/code.js" as Code
+import QtQuick
+import QtQuick.Controls as Controls
+import QtQuick.Layouts
 
 Item {
     id: root
@@ -41,7 +38,7 @@ Item {
     property alias cfg_coloredCpuLoad: coloredCpuLoadCheckBox.checked
     property alias cfg_flatCpuLoad: flatCpuLoadCheckBox.checked
     property alias cfg_indicatorHeight: indicatorHeightSpinBox.value
-    property alias cfg_updateInterval: updateIntervalSpinBox.value
+    property alias cfg_updateInterval: updateIntervalSlider.value
 
     ColumnLayout {
         id: settingsLayout
@@ -77,8 +74,8 @@ Item {
 
                 SpinBox {
                     id: indicatorHeightSpinBox
-                    minimumValue: 1
-                    maximumValue: 99
+                    from: 1
+                    to: 99
                     Layout.row: 2
                     Layout.column: 1
                 }
@@ -97,20 +94,24 @@ Item {
             Layout.fillWidth: true
 
             GridLayout {
-                columns: 2
+                columns: 3
 
                 Label {
                     text: i18n('Update interval:')
                     Layout.alignment: Qt.AlignRight
                 }
 
-                SpinBox {
-                    id: updateIntervalSpinBox
-                    decimals: 1
+                // Plasma 6 的 SpinBox 不支持小数，用 Slider 替代
+                Controls.Slider {
+                    id: updateIntervalSlider
+                    from: 0.1
+                    to: 10.0
                     stepSize: 0.1
-                    minimumValue: 0.1
-                    maximumValue: 10.0
-                    suffix: i18nc('Abbreviation for seconds', 's')
+                    Layout.fillWidth: true
+                }
+
+                Label {
+                    text: i18n("%1 s", updateIntervalSlider.value.toFixed(1))
                 }
             }
         }

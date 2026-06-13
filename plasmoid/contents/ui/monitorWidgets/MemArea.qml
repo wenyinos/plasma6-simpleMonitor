@@ -17,8 +17,8 @@
  * along with plasma-simpleMonitor.  If not, see <http://www.gnu.org/licenses/>.
  **/
 
-import QtQuick 2.0
-import QtQuick.Layouts 1.1
+import QtQuick
+import QtQuick.Layouts
 
 Item {
     property double memFree: 0.0
@@ -39,12 +39,10 @@ Item {
     ColumnLayout {
         id: memColumn
 
-        spacing: 2 * units.devicePixelRatio
-        anchors.fill: parent
+        spacing: 2        anchors.fill: parent
 
         RowLayout {
-            spacing: 3 * units.devicePixelRatio
-            Text {
+            spacing: 3            Text {
                 id: memType
                 text: i18n("Mem:")
                 font { family: doppioOneRegular.name; pointSize: 12 }
@@ -59,8 +57,7 @@ Item {
 
         RowLayout {
             id: memoryInfoLabels
-            spacing: 3 * units.devicePixelRatio
-            property int fontSize : 8
+            spacing: 3            property int fontSize : 8
             Text {
                 text: i18n("Used:")
                 color: "red"
@@ -87,8 +84,7 @@ Item {
 
         Rectangle {
             id: rectTotalMemory
-            height: 7 * units.devicePixelRatio
-            Layout.fillWidth: true
+            height: 7            Layout.fillWidth: true
             color: "#7ec264"
             Rectangle {
                 id: rectUsedMemory

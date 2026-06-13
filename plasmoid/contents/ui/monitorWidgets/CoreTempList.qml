@@ -17,7 +17,7 @@
  * along with plasma-simpleMonitor.  If not, see <http://www.gnu.org/licenses/>.
  **/
 
-import QtQuick 2.0
+import QtQuick
 
 ListView {
     id: coreTempList
@@ -26,9 +26,7 @@ ListView {
     LayoutMirroring.enabled: direction === Qt.RightToLeft
     LayoutMirroring.childrenInherit: true
 
-    implicitHeight: count * 25 * units.devicePixelRatio
-    implicitWidth: 100 * units.devicePixelRatio
-
+    implicitHeight: count * 25    implicitWidth: 100
     interactive: false
 
     property int highTemp: 80
@@ -41,11 +39,9 @@ ListView {
 
     delegate: Item {
         id: coreListTemp
-        implicitHeight: 25 * units.devicePixelRatio
-        implicitWidth: coreLabel.implicitWidth + unitLabel.implicitWidth
+        implicitHeight: 25        implicitWidth: coreLabel.implicitWidth + unitLabel.implicitWidth
         width: parent.width
-        height: (20 + indicatorHeight) * units.devicePixelRatio
-        Text {
+        height: (20 + indicatorHeight)        Text {
             id: coreLabel
             anchors.left: parent.left
             text: if (coreLabelStr == "") i18n('CPU %1:', model.index); else i18n(coreLabelStr)
@@ -65,18 +61,17 @@ ListView {
 
         Rectangle {
             id: rectValue
-            height: 11 * units.devicePixelRatio
-            width: Math.floor(val/coreTempList.criticalTemp*parent.width)
+            height: 11            width: Math.floor(val/coreTempList.criticalTemp*parent.width)
             color: if (val >= coreTempList.criticalTemp) "red"
                    else if (val >= coreTempList.highTemp) "#ffac2a"
                    else "#85a9ff"
             anchors.top: coreLabel.bottom
             anchors.right: parent.right
-            anchors.topMargin: units.devicePixelRatio
+            anchors.topMargin: 1
         }
         ListView.onAdd: SequentialAnimation {
             PropertyAction { target: coreListTemp; property: "height"; value: 0 }
-            NumberAnimation { target: coreListTemp; property: "height"; to: 30 * units.devicePixelRatio; duration: 250; easing.type: Easing.InOutQuad }
+            NumberAnimation { target: coreListTemp; property: "height"; to: 30; duration: 250; easing.type: Easing.InOutQuad }
         }
     }
 

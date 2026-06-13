@@ -17,9 +17,9 @@
  * along with plasma-simpleMonitor.  If not, see <http://www.gnu.org/licenses/>.
  **/
 
-import QtQuick 2.0
-import QtQuick.Layouts 1.1
-import org.kde.plasma.components 2.0 as PlasmaComponents
+import QtQuick
+import QtQuick.Layouts
+import QtQuick.Controls as Controls
 
 import "../monitorWidgets"
 import "../components"
@@ -74,12 +74,12 @@ BaseSkin {
                     onClicked: logoPopup.open(mouse.x, mouse.y)
                 }
 
-                PlasmaComponents.ContextMenu {
+                Controls.Menu {
                     id: logoPopup
 
-                    PlasmaComponents.MenuItem {
+                    Controls.MenuItem {
                         text: distroLogo.editMode ? i18n("Lock image scaling") : i18n("Unlock image scaling")
-                        onClicked: distroLogo.editMode = !distroLogo.editMode
+                        onTriggered: distroLogo.editMode = !distroLogo.editMode
                     }
                 }
             }

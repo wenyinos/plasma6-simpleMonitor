@@ -111,11 +111,11 @@ msgstr "ЦПУ %1:"
 
 #: ../plasmoid/contents/ui/monitorWidgets/DatePicker.qml:52
 msgid "mie"
-msgstr "пон"
+msgstr "ср"
 
 #: ../plasmoid/contents/ui/monitorWidgets/DatePicker.qml:75
 msgid "dic"
-msgstr "янв"
+msgstr "дек"
 
 #: ../plasmoid/contents/ui/monitorWidgets/MemArea.qml:49
 msgid "Mem:"

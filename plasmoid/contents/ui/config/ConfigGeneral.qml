@@ -17,10 +17,10 @@
  * along with plasma-simpleMonitor.  If not, see <http://www.gnu.org/licenses/>.
  **/
 
-import QtQuick 2.0
-import QtQuick.Controls 1.0
-import QtQuick.Layouts 1.1
-import org.kde.plasma.core 2.0 as PlasmaCore
+import QtQuick
+import QtQuick.Controls as Controls
+import QtQuick.Layouts
+import org.kde.kirigami as Kirigami
 
 import "../../code/code.js" as Code
 
@@ -61,16 +61,16 @@ Item {
 
     onCfg_bgColorChanged: {
         switch (cfg_bgColor) {
-            default: case 0: bgColorTypeGroup.current = standardBgColor; break;
-            case 1: bgColorTypeGroup.current = crystalBgColor; break;
-            case 2: bgColorTypeGroup.current = translucentBgColor; break;
+        default: case 0: bgColorTypeGroup.current = standardBgColor; break;
+        case 1: bgColorTypeGroup.current = crystalBgColor; break;
+        case 2: bgColorTypeGroup.current = translucentBgColor; break;
         }
     }
 
     onCfg_tempUnitChanged: {
         switch (cfg_tempUnit) {
-            default: case 0: tempUnitTypeGroup.current = celsiusTemp; break;
-            case 1: tempUnitTypeGroup.current = fahrenheitTemp; break;
+        default: case 0: tempUnitTypeGroup.current = celsiusTemp; break;
+        case 1: tempUnitTypeGroup.current = fahrenheitTemp; break;
         }
     }
 
@@ -79,11 +79,11 @@ Item {
         cfg_tempUnitChanged();
     }
 
-    ExclusiveGroup {
+    Controls.ButtonGroup {
         id: bgColorTypeGroup
     }
 
-    ExclusiveGroup {
+    Controls.ButtonGroup {
         id: tempUnitTypeGroup
     }
 
@@ -123,7 +123,7 @@ Item {
                     implicitWidth:  logoComboBox.width + 10
 
                     color: "transparent"
-                    border { width: 1; color: theme.buttonTextColor }
+                    border { width: 1; color: Kirigami.Theme.buttonTextColor }
                     radius: 2
 
                     Image {
@@ -145,7 +145,7 @@ Item {
 
                 RadioButton {
                     id: standardBgColor
-                    exclusiveGroup: bgColorTypeGroup
+                    Controls.ButtonGroup.group: bgColorTypeGroup
                     text: i18n("Standard")
                     onCheckedChanged: if (checked) cfg_bgColor = 0;
                     Layout.row: 2
@@ -154,7 +154,7 @@ Item {
 
                 RadioButton {
                     id: crystalBgColor
-                    exclusiveGroup: bgColorTypeGroup
+                    Controls.ButtonGroup.group: bgColorTypeGroup
                     text: i18n("Crystal")
                     onCheckedChanged: if (checked) cfg_bgColor = 1;
                     Layout.row: 3
@@ -163,7 +163,7 @@ Item {
 
                 RadioButton {
                     id: translucentBgColor
-                    exclusiveGroup: bgColorTypeGroup
+                    Controls.ButtonGroup.group: bgColorTypeGroup
                     text: i18n("Translucent")
                     onCheckedChanged: if (checked) cfg_bgColor = 2;
                     Layout.row: 4
@@ -213,7 +213,7 @@ Item {
                     Layout.column: 0
                     Layout.columnSpan: 3
                     text: i18n("<i>(You can use the <strong>sensors</strong> command to place the appropriate values ​​for this section.)</i>")
-                    color: theme.highlightColor
+                    color: Kirigami.Theme.highlightColor
                     wrapMode: Text.WordWrap
                 }
 
@@ -226,7 +226,7 @@ Item {
 
                 RadioButton {
                     id: celsiusTemp
-                    exclusiveGroup: tempUnitTypeGroup
+                    Controls.ButtonGroup.group: tempUnitTypeGroup
                     text: i18n("Celsius °C")
                     onCheckedChanged: if (checked) cfg_tempUnit = 0;
                     Layout.row: 1
@@ -235,7 +235,7 @@ Item {
 
                 RadioButton {
                     id: fahrenheitTemp
-                    exclusiveGroup: tempUnitTypeGroup
+                    Controls.ButtonGroup.group: tempUnitTypeGroup
                     text: i18n("Fahrenheit °F")
                     onCheckedChanged: if (checked) cfg_tempUnit = 1;
                     Layout.row: 2
@@ -264,7 +264,7 @@ Item {
 
                 SpinBox {
                     id: cpuCritTempSpinBox
-                    maximumValue: 150
+                    to: 150
                     Layout.row: 4
                     Layout.column: 1
                 }

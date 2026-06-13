@@ -15,6 +15,41 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
     ### Fixed
     - Plasmoid logo path in .desktop file.
 
+## [0.7] - 2026-06-13
+    ### Added
+    - Plasma 6 / KF6 native support.
+    - KSystemStats sensor integration (CPU, memory, GPU, uptime).
+    - GPU temperature fallback via nvidia-smi when KSystemStats sensor unavailable.
+    - metadata.json (replaces metadata.desktop for Plasma 6).
+
+    ### Changed
+    - Migrated from Plasma 5 / KF5 to Plasma 6 / KF6.
+    - Migrated from PlasmaCore.DataSource to org.kde.ksysguard.sensors.Sensor.
+    - Migrated from Qt Quick Controls 1 to Qt Quick Controls 2.
+    - ExclusiveGroup replaced with ButtonGroup.
+    - SpinBox with decimal support replaced with Slider (update interval setting).
+    - theme.highlightColor / theme.buttonTextColor replaced with Kirigami.Theme.
+    - PlasmaComponents.ContextMenu replaced with Controls.Menu.
+    - Removed units.devicePixelRatio scaling (Qt 6 handles high DPI automatically).
+    - Removed version numbers from QML imports (Qt 6 convention).
+    - backgroundHints uses Plasmoid attached property and PlasmaTypes enum.
+    - CMakeLists.txt updated for KF6 (cmake >= 3.16, KF6Plasma).
+    - plasmapkg2 replaced with kpackagetool6 in all scripts.
+    - plasmoidviewer replaced with plasmoidviewer6.
+    - kbuildsycoca5 replaced with kbuildsycoca6.
+    - translations/Messages.sh reads from metadata.json.
+
+    ### Fixed
+    - Polish translation: corrected "mie" (Wednesday), "dic" (December), "Uptime:".
+    - Russian translation: corrected "mie" (Wednesday), "dic" (December).
+    - Turkish translation: corrected "mie" (Wednesday), "Uptime:" (was in Polish).
+    - Chinese translation: corrected "mie" (Wednesday), "dic" (December), "Free:", "Logo:".
+
+    ### Removed
+    - Plasma 5 / KF5 support.
+    - PlasmaCore.DataSource data engine dependency.
+    - es_ES and eu_ES empty translation directories.
+
 ## [0.6] - 2017-03-19
     ### Added
     - Translation support.

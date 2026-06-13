@@ -17,10 +17,9 @@
  * along with plasma-simpleMonitor.  If not, see <http://www.gnu.org/licenses/>.
  **/
 
-import QtQuick 2.0
-import QtQuick.Controls 1.0
-import QtQuick.Layouts 1.1
-import org.kde.plasma.core 2.0 as PlasmaCore
+import QtQuick
+import QtQuick.Controls as Controls
+import QtQuick.Layouts
 
 import "../../code/code.js" as Code
 
@@ -53,7 +52,7 @@ Item {
                 anchors.verticalCenter: skinComboBox.verticalCenter
             }
 
-            ComboBox {
+            Controls.ComboBox {
                 id: skinComboBox
                 model: [i18n("Default"), i18n("Column")]
 

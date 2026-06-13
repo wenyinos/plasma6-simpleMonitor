@@ -1,0 +1,37 @@
+{
+    "KPlugin": {
+        "Id": "org.kde.simpleMonitor",
+        "Name": {
+            "": "Simple System Monitor",
+            "ru_RU": "Простой системный монитор",
+            "tr": "Sistem Görüntüleyici"
+        },
+        "Description": {
+            "": "Plasma Simple System Monitor",
+            "ru_RU": "Простой системный монитор-плазмоид",
+            "tr": "Sistem Durumu Görüntüleyici"
+        },
+        "Icon": "simpleMonitor_icon",
+        "Category": "System Information",
+        "Version": "0.7",
+        "Website": "http://plasma.kde.org/",
+        "Authors": [
+            {
+                "Name": "DhabyX",
+                "Email": "slack.dhabyx@gmail.com"
+            },
+            {
+                "Name": "Konstantin Shtepa",
+                "Email": "oss.konstantin.shtepa@yandex.ru"
+            }
+        ],
+        "License": "GPL-3.0",
+        "FormFactors": ["tablet", "mediacenter", "desktop"],
+        "EnabledByDefault": true
+    },
+    "X-Plasma-API": "declarativeappletscript",
+    "X-Plasma-MainScript": "ui/main.qml",
+    "X-Plasma-StandAloneApp": true,
+    "X-Plasma-Requires-FileDialog": "Unused",
+    "X-Plasma-Requires-LaunchApp": "Unused"
+}

@@ -39,7 +39,7 @@ msgstr "部件设置："
 
 #: ../plasmoid/contents/ui/config/ConfigGeneral.qml:101
 msgid "Logo:"
-msgstr "徽标："
+msgstr "Logo:"
 
 #: ../plasmoid/contents/ui/config/ConfigGeneral.qml:134
 msgid "Background color:"
@@ -109,11 +109,11 @@ msgstr "CPU %1："
 
 #: ../plasmoid/contents/ui/monitorWidgets/DatePicker.qml:52
 msgid "mie"
-msgstr "星期一"
+msgstr "星期三"
 
 #: ../plasmoid/contents/ui/monitorWidgets/DatePicker.qml:75
 msgid "dic"
-msgstr "一月"
+msgstr "十二月"
 
 #: ../plasmoid/contents/ui/monitorWidgets/MemArea.qml:49
 msgid "Mem:"
@@ -131,7 +131,7 @@ msgstr "使用："
 
 #: ../plasmoid/contents/ui/monitorWidgets/MemArea.qml:76
 msgid "Free:"
-msgstr "空余："
+msgstr "空闲："
 
 #: ../plasmoid/contents/ui/monitorWidgets/UptimePicker.qml:37
 msgid "Uptime:"

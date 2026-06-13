@@ -17,11 +17,12 @@
  * along with plasma-simpleMonitor.  If not, see <http://www.gnu.org/licenses/>.
  **/
 
-import QtQuick 2.0
-import QtQuick.Layouts 1.1
-import org.kde.plasma.plasmoid 2.0
-import org.kde.plasma.core 2.0 as PlasmaCore
-import QtQuick.Controls 1.0
+import QtQuick
+import QtQuick.Layouts
+import QtQuick.Controls as Controls
+import org.kde.plasma.plasmoid
+import org.kde.plasma.extras as PlasmaExtras
+import org.kde.ksysguard.sensors as Sensors
 
 import "../code/code.js" as Code
 
@@ -39,23 +40,30 @@ Rectangle {
     Layout.preferredWidth: implicitWidth
     Layout.preferredHeight: implicitHeight
 
-    Plasmoid.preferredRepresentation: plasmoid.fullRepresentation
+    Plasmoid.preferredRepresentation: Plasmoid.fullRepresentation
 
     color: "black"
 
-    // Control for atk sensor.
     property bool atkPresent: false
 
     Component.onCompleted: atkPresent = false
 
-    // Configuration properties.
-    property bool showGpuTemp:      plasmoid.configuration.showGpuTemp
-    property double updateInterval: plasmoid.configuration.updateInterval
+    property bool showGpuTemp: plasmoid.configuration.showGpuTemp
+
+    // 内存传感器绑定，供皮肤 delegate 读取
+    property alias memFree: memFreeSensor.value
+    property alias memTotal: memTotalSensor.value
+    property alias memUsed: memUsedSensor.value
+    property alias memBuffers: memBuffersSensor.value
+    property alias memCached: memCachedSensor.value
+    property alias swapFree: swapFreeSensor.value
+    property alias swapTotal: swapTotalSensor.value
+    property alias swapUsed: swapUsedSensor.value
+    property alias uptime: uptimeSensor.value
 
     QtObject {
         id: confEngine
 
-        // Configuration properties.
         property int skin:              plasmoid.configuration.skin
         property int bgColor:           plasmoid.configuration.bgColor
         property int logo:              plasmoid.configuration.logo
@@ -68,6 +76,7 @@ Rectangle {
         property bool coloredCpuLoad:   plasmoid.configuration.coloredCpuLoad
         property bool flatCpuLoad:      plasmoid.configuration.flatCpuLoad
         property int indicatorHeight:   plasmoid.configuration.indicatorHeight
+        property double updateInterval: plasmoid.configuration.updateInterval
 
         property string distroName: "tux"
         property string distroId: "tux"
@@ -109,15 +118,15 @@ Rectangle {
             default:
             case 0:
                 root.color = "black";
-                plasmoid.backgroundHints = "StandardBackground";
+                Plasmoid.backgroundHints = PlasmaTypes.StandardBackground;
                 break;
             case 1:
                 root.color = "transparent";
-                plasmoid.backgroundHints = "NoBackground";
+                Plasmoid.backgroundHints = PlasmaTypes.NoBackground;
                 break;
             case 2:
                 root.color = "transparent";
-                plasmoid.backgroundHints = "TranslucentBackground";
+                Plasmoid.backgroundHints = PlasmaTypes.TranslucentBackground;
                 break;
             }
         }
@@ -164,241 +173,94 @@ Rectangle {
         id: gpuTempModel
     }
 
-    PlasmaCore.DataSource {
-        id: systemInfoDataSource
-        engine: "systemmonitor"
-        interval: updateInterval * 1000
+    // === KSystemStats 传感器 ===
 
-        property alias delegate: loader.item
-
-        function tryAddSource(source) {
-            if (connectedSources.indexOf(source) !== -1)
-                return;
-
-            // connect to cpu load sources
-            if (source.match("^cpu/cpu\\d+/TotalLoad")) {
-                connectSource(source);
-                return;
-            }
-
-            // connect to cpu temp sources
-            if (source.match("^lmsensors/coretemp-isa-\\d+/Core_\\d+")) {
-                connectSource(source);
-                return;
-            }
-            if (source.match("^lmsensors/k\\d+temp-pci-.+/.+")) {
-                /* if atk is present then not connect */
-                if (!root.atkPresent) {
-                    connectSource(source);
+    // CPU 负载（每核）
+    Repeater {
+        id: cpuSensorsRepeater
+        model: 128
+        Sensors.Sensor {
+            sensorId: "cpu/cpu" + index + "/usage"
+            onValueChanged: {
+                if (value >= 0) {
+                    if (cpuModel.count <= index)
+                        cpuModel.append({'val': value});
+                    else
+                        cpuModel.set(index, {'val': value});
                 }
-                return;
-            }
-            /* Some AMD sensors works better with atk data*/
-            if (source.match("^lmsensors/atk\\d+-acpi-\\d/CPU_Temperature")) {
-                /* Remove k# temp sensors previously connected*/
-                if (!root.atkPresent) {
-                    for (i in connectedSources) {
-                        if (i.match("^lmsensors/k\\d+temp-pci-.+/.+")) {
-                            disconnectSource(i);
-                            coreTempModel.clear();
-                        }
-
-                    }
-                }
-                root.atkPresent = true;
-                connectSource(source);
-                return;
-            }
-
-            // connect memory sources
-            if (source.match("^mem/.*")) {
-                connectSource(source);
-                return;
-            }
-
-            // connect uptime source
-            if (source.match("^system/uptime")) {
-                connectSource(source);
-                return;
             }
         }
+    }
 
-        onSourceAdded: tryAddSource(source)
+    // CPU 温度（每核）
+    Repeater {
+        id: coreTempSensorsRepeater
+        model: 128
+        Sensors.Sensor {
+            sensorId: "cpu/cpu" + index + "/temperature"
+            onValueChanged: {
+                if (value > 0) {
+                    if (coreTempModel.count <= index)
+                        coreTempModel.append({'val': value, 'dataUnits': '°C', 'coreLabelStr': ''});
+                    else
+                        coreTempModel.set(index, {'val': value, 'dataUnits': '°C', 'coreLabelStr': ''});
+                }
+            }
+        }
+    }
 
-        onNewData: {
-            if (data.value === undefined || delegate === undefined)
-                return;
+    // 内存传感器
+    Sensors.Sensor { id: memFreeSensor;    sensorId: "memory/physical/free" }
+    Sensors.Sensor { id: memTotalSensor;   sensorId: "memory/physical/total" }
+    Sensors.Sensor { id: memUsedSensor;    sensorId: "memory/physical/used" }
+    Sensors.Sensor { id: memBuffersSensor; sensorId: "memory/physical/buffers" }
+    Sensors.Sensor { id: memCachedSensor;  sensorId: "memory/physical/cached" }
+    Sensors.Sensor { id: swapFreeSensor;   sensorId: "memory/swap/free" }
+    Sensors.Sensor { id: swapTotalSensor;  sensorId: "memory/swap/total" }
+    Sensors.Sensor { id: swapUsedSensor;   sensorId: "memory/swap/used" }
 
-            // cpu load
-            if (sourceName.match("^cpu/cpu\\d+/TotalLoad")) {
-                var cpuNumber = sourceName.split('/')[1].match(/\d+/);
-                if (cpuModel.count <= cpuNumber)
-                    cpuModel.append({'val':data.value});
+    // 运行时间
+    Sensors.Sensor { id: uptimeSensor; sensorId: "system/uptime" }
+
+    // GPU 温度（KSystemStats 原生传感器）
+    Sensors.Sensor {
+        id: gpuTempSensor
+        sensorId: "gpu/gpu0/temperature"
+        enabled: showGpuTemp
+        onValueChanged: {
+            if (value > 0) {
+                if (gpuTempModel.count === 0)
+                    gpuTempModel.append({'val': value, 'dataUnits': '°C', 'gpuLabelStr': 'GPU'});
                 else
-                    cpuModel.set(cpuNumber,{'val':data.value});
-                return;
-            }
-
-            // cpu temp
-            if (sourceName.match("^lmsensors/coretemp-isa-\\d+/Core_\\d+")
-                    || sourceName.match("^lmsensors/k\\d+temp-pci-.+/.+")
-                    || sourceName.match("^lmsensors/atk\\d+-acpi-\\d/CPU_Temperature")) {
-                var dataName = "0";
-                var coreLabelStr = ""
-                if (root.atkPresent) {
-                    dataName=sourceName.replace(/^lmsensors\/atk\\d+-acpi-/i,"").replace(/\/CPU_Temperature/i,"");
-                } else if(sourceName.match("^lmsensors/k10temp-pci-.+/.+")) {
-                    dataName = Code.k10CoreIndex(sourceName.replace(/^lmsensors\/k10temp-pci-/i,""));
-                    coreLabelStr = sourceName.replace(/^lmsensors\/k10temp-pci-.+\//i,"")
-                } else {
-                    dataName=data.name.split(' ')[1];
-                }
-
-                if (coreTempModel.count <= dataName)
-                    coreTempModel.append({'val':data.value, 'dataUnits':data.units, 'coreLabelStr':coreLabelStr});
-                else
-                    coreTempModel.set(dataName,{'val':data.value, 'dataUnits':data.units, 'coreLabelStr':coreLabelStr});
-
-                return;
-            }
-
-            // memory
-            if (sourceName.match("^mem/physical/free")) {
-                delegate.memFree=data.value/1048576;
-                delegate.memTotal=data.max/1048576;
-                return;
-            }
-            if (sourceName.match("^mem/physical/used")) {
-                delegate.memUsed=data.value/1048576;
-                return;
-            }
-            if (sourceName.match("^mem/physical/buf")) {
-                delegate.memBuffers=data.value/1048576;
-                return;
-            }
-            if (sourceName.match("^mem/physical/cached")) {
-                delegate.memCached=data.value/1048576;
-                return;
-            }
-            if (sourceName.match("^mem/swap/used")) {
-                delegate.swapUsed=data.value/1048576;
-                delegate.swapTotal=data.max/1048576;
-                return;
-            }
-            if (sourceName.match("^mem/swap/free")) {
-                delegate.swapFree=data.value/1048576;
-                return;
-            }
-
-            // uptime
-            if (sourceName.match("^system/uptime")) {
-                delegate.uptime = data.value;
-                return;
-            }
-        }
-
-        Component.onCompleted: {
-            for (var i in systemInfoDataSource.sources)
-                systemInfoDataSource.tryAddSource(systemInfoDataSource.sources[i]);
-        }
-
-        Component.onDestruction: {
-            for (var i = connectedSources.length; i > 0; --i)
-                disconnectSource(connectedSources[i - 1]);
-        }
-    }
-
-    PlasmaCore.DataSource {
-        id: nvidiaDataSource
-        engine: 'executable'
-        interval: if (showGpuTemp) updateInterval * 1000; else 0
-
-        connectedSources: [ 'nvidia-smi --query-gpu=temperature.gpu --format=csv,noheader' ]
-
-        property bool gpuAppended: false
-
-        onNewData: {
-            var dataName = "NVIDIA";
-            var gpuLabelStr = "NVIDIA GPU"
-            var temperature = 0
-            if (data['exit code'] != 0 || data.stdout == '') {
-//                print('NVIDIA data error: ' + data.stderr)
-                return
-            } else {
-                temperature = parseFloat(data.stdout)
-                if (isNaN(temperature))
-                    return
-            }
-
-            if (gpuAppended == false) {
-                gpuTempModel.append({'val':temperature, 'dataUnits':'°C', 'gpuLabelStr':gpuLabelStr});
-                gpuAppended = true
-            } else {
-                gpuTempModel.set(dataName,{'val':temperature, 'dataUnits':'°C', 'gpuLabelStr':gpuLabelStr});
+                    gpuTempModel.set(0, {'val': value, 'dataUnits': '°C', 'gpuLabelStr': 'GPU'});
             }
         }
     }
 
-    PlasmaCore.DataSource {
-        id: atiDataSource
-        engine: 'executable'
-        interval: if (showGpuTemp) updateInterval * 1000; else 0
+    // GPU 温度回退：KSystemStats 无传感器时，通过 nvidia-smi 命令获取
+    PlasmaExtras.CommandRunner {
+        id: nvidiaCmd
+        running: false
+        sourceCommand: "nvidia-smi --query-gpu=temperature.gpu --format=csv,noheader"
 
-        connectedSources: [ 'aticonfig --od-gettemperature | tail -1 | cut -c 43-44' ]
-
-        property bool gpuAppended: false
-
-        onNewData: {
-            var dataName = "ATI";
-            var gpuLabelStr = "ATI GPU"
-            var temperature = 0
-            if (data['exit code'] != 0 || data.stdout == '') {
-//                print('ATI data error: ' + data.stderr)
-                return
-            } else {
-                temperature = parseFloat(data.stdout)
-                if (isNaN(temperature))
-                    return
-            }
-
-            if (gpuAppended == false) {
-                gpuTempModel.append({'val':temperature, 'dataUnits':'°C', 'gpuLabelStr':gpuLabelStr});
-                gpuAppended = true
-            } else {
-                gpuTempModel.set(dataName,{'val':temperature, 'dataUnits':'°C', 'gpuLabelStr':gpuLabelStr});
-            }
+        onExited: function(exitCode, exitStatus, stdout, stderr) {
+            if (exitCode !== 0 || stdout.trim() === "")
+                return;
+            var temperature = parseFloat(stdout.trim());
+            if (isNaN(temperature))
+                return;
+            if (gpuTempModel.count === 0)
+                gpuTempModel.append({'val': temperature, 'dataUnits': '°C', 'gpuLabelStr': 'NVIDIA GPU'});
+            else
+                gpuTempModel.set(0, {'val': temperature, 'dataUnits': '°C', 'gpuLabelStr': 'NVIDIA GPU'});
         }
     }
 
-    PlasmaCore.DataSource {
-        id: amdDataSource
-        engine: 'executable'
-        interval: if (showGpuTemp) updateInterval * 1000; else 0
-
-        connectedSources: [ 'amdconfig --od-gettemperature | tail -1 | cut -c 43-44' ]
-
-        property bool gpuAppended: false
-
-        onNewData: {
-            var dataName = "AMD";
-            var gpuLabelStr = "AMD GPU"
-            var temperature = 0
-            if (data['exit code'] != 0 || data.stdout == '') {
-//                print('AMD data error: ' + data.stderr)
-                return
-            } else {
-                temperature = parseFloat(data.stdout)
-                if (isNaN(temperature))
-                    return
-            }
-
-            if (gpuAppended == false) {
-                gpuTempModel.append({'val':temperature, 'dataUnits':'°C', 'gpuLabelStr':gpuLabelStr});
-                gpuAppended = true
-            } else {
-                gpuTempModel.set(dataName,{'val':temperature, 'dataUnits':'°C', 'gpuLabelStr':gpuLabelStr});
-            }
-        }
+    Timer {
+        interval: plasmoid.configuration.updateInterval * 1000
+        running: showGpuTemp
+        repeat: true
+        onTriggered: nvidiaCmd.exec()
     }
 
     Loader {

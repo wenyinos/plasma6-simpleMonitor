@@ -44,7 +44,7 @@ msgstr "Ustawienia elementów:"
 
 #: ../plasmoid/contents/ui/config/ConfigGeneral.qml:101
 msgid "Logo:"
-msgstr ""
+msgstr "Logo:"
 
 #: ../plasmoid/contents/ui/config/ConfigGeneral.qml:134
 msgid "Background color:"
@@ -68,7 +68,7 @@ msgstr "Wyświetl:"
 
 #: ../plasmoid/contents/ui/config/ConfigGeneral.qml:170
 msgid "Swap"
-msgstr ""
+msgstr "Pamięć wymiany"
 
 #: ../plasmoid/contents/ui/config/ConfigGeneral.qml:175
 msgid "Uptime"
@@ -112,15 +112,15 @@ msgstr "Rdzeń %1:"
 
 #: ../plasmoid/contents/ui/monitorWidgets/CpuWidget.qml:58
 msgid "CPU %1:"
-msgstr ""
+msgstr "CPU %1:"
 
 #: ../plasmoid/contents/ui/monitorWidgets/DatePicker.qml:52
 msgid "mie"
-msgstr ""
+msgstr "śr"
 
 #: ../plasmoid/contents/ui/monitorWidgets/DatePicker.qml:75
 msgid "dic"
-msgstr ""
+msgstr "gru"
 
 #: ../plasmoid/contents/ui/monitorWidgets/MemArea.qml:49
 msgid "Mem:"
@@ -130,7 +130,7 @@ msgstr "Pamięć:"
 #: ../plasmoid/contents/ui/monitorWidgets/MemArea.qml:71
 #: ../plasmoid/contents/ui/monitorWidgets/MemArea.qml:82
 msgid "%1 GiB"
-msgstr ""
+msgstr "%1 GiB"
 
 #: ../plasmoid/contents/ui/monitorWidgets/MemArea.qml:65
 msgid "Used:"
@@ -142,11 +142,11 @@ msgstr "Wolne:"
 
 #: ../plasmoid/contents/ui/monitorWidgets/UptimePicker.qml:37
 msgid "Uptime:"
-msgstr "Czas pracy:"
+msgstr "Czas działania:"
 
 #: ../plasmoid/contents/ui/monitorWidgets/UptimePicker.qml:43
 msgid "%1d %2:%3"
-msgstr ""
+msgstr "%1d %2:%3"
 
 #: ../plasmoid/contents/ui/skins/ColumnSkin.qml:113
 #: ../plasmoid/contents/ui/skins/DefaultSkin.qml:92
@@ -161,4 +161,4 @@ msgstr "Odblokuj skalowanie obrazków"
 #: ../plasmoid/contents/ui/skins/ColumnSkin.qml:251
 #: ../plasmoid/contents/ui/skins/DefaultSkin.qml:250
 msgid "Swap:"
-msgstr ""
+msgstr "Swap:"

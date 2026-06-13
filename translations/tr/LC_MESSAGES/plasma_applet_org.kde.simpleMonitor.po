@@ -116,11 +116,11 @@ msgstr "İşlemci %1"
 
 #: ../plasmoid/contents/ui/monitorWidgets/DatePicker.qml:52
 msgid "mie"
-msgstr "benim"
+msgstr "Çar"
 
 #: ../plasmoid/contents/ui/monitorWidgets/DatePicker.qml:75
 msgid "dic"
-msgstr ""
+msgstr "Ara"
 
 #: ../plasmoid/contents/ui/monitorWidgets/MemArea.qml:49
 msgid "Mem:"
@@ -130,7 +130,7 @@ msgstr "Hafıza:"
 #: ../plasmoid/contents/ui/monitorWidgets/MemArea.qml:71
 #: ../plasmoid/contents/ui/monitorWidgets/MemArea.qml:82
 msgid "%1 GiB"
-msgstr ""
+msgstr "%1 GiB"
 
 #: ../plasmoid/contents/ui/monitorWidgets/MemArea.qml:65
 msgid "Used:"
@@ -142,11 +142,11 @@ msgstr "Boşta:"
 
 #: ../plasmoid/contents/ui/monitorWidgets/UptimePicker.qml:37
 msgid "Uptime:"
-msgstr "Czas pracy:"
+msgstr "Çalışma süresi:"
 
 #: ../plasmoid/contents/ui/monitorWidgets/UptimePicker.qml:43
 msgid "%1d %2:%3"
-msgstr ""
+msgstr "%1g %2:%3"
 
 #: ../plasmoid/contents/ui/skins/ColumnSkin.qml:113
 #: ../plasmoid/contents/ui/skins/DefaultSkin.qml:92
