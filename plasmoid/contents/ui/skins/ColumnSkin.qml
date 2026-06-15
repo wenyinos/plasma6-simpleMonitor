@@ -34,7 +34,9 @@ BaseSkin {
     ColumnLayout {
         id: mainLayout
 
-        anchors.fill: parent
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.top: parent.top
         anchors.margins: 5
         spacing: 0
 

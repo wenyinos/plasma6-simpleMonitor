@@ -29,7 +29,7 @@ ListView {
     property color progressColor: "#993de515"
     
     implicitWidth: 100
-    implicitHeight: childrenRect.height
+    implicitHeight: contentHeight
 
     model: cpuModel
     interactive: false

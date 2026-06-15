@@ -34,10 +34,11 @@ BaseSkin {
     GridLayout {
         id: mainLayout
 
-        anchors.fill: parent
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.top: parent.top
         anchors.margins: 5
         columns: 4
-        rows: 8
         columnSpacing: 0
         rowSpacing: 0
 

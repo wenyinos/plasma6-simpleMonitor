@@ -55,7 +55,6 @@ ColumnLayout {
         style: Text.Outline
         styleColor: "#80000000"
         font.capitalization: Font.AllLowercase
-        Layout.bottomMargin: -20
     }
 
     Row {

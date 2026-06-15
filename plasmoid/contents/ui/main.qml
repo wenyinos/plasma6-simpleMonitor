@@ -138,15 +138,25 @@ PlasmoidItem {
     ListModel { id: coreTempModel }
     ListModel { id: gpuTempModel }
 
-    fullRepresentation: Item {
+    fullRepresentation: ColumnLayout {
         id: rep
-        Layout.minimumWidth: 50
-        Layout.minimumHeight: 50
+        spacing: 0
+        Layout.minimumWidth: loader.implicitWidth
+        Layout.minimumHeight: loader.implicitHeight
         Layout.preferredWidth: loader.implicitWidth
         Layout.preferredHeight: loader.implicitHeight
         Rectangle {
-            id: repBg; anchors.fill: parent; color: "black"
-            Loader { id: loader; anchors.fill: parent; source: "skins/DefaultSkin.qml" }
+            id: repBg
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            color: "black"
+            Loader {
+                id: loader
+                Layout.fillWidth: true
+                Layout.preferredHeight: item ? item.implicitHeight : 0
+                Layout.minimumHeight: item ? item.implicitHeight : 0
+                source: "skins/DefaultSkin.qml"
+            }
         }
         Connections {
             target: confEngine

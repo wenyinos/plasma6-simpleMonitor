@@ -1,6 +1,8 @@
 Simple Monitor for Plasma
 =========================
 
+**[中文](README_zh-CN.md)**
+
 A simple monitor for plasma, completely written in QML and Javascript.
 
 Dependencies
@@ -26,7 +28,7 @@ Installation
 If you need localisation (i18n/l10n) support, please use `cmake` to install this widget to your system-wide directory. You also would need root permission.
 
 ````Shell
-git clone https://github.com/dhabyx/plasma-simpleMonitor.git plasma-simpleMonitor
+git clone https://github.com/wenyinos/plasma6-simpleMonitor.git
 cd plasma-simpleMonitor
 mkdir build
 cd build
@@ -39,7 +41,7 @@ This way may be more convenient, but localisation support is not possible via `k
 
 Installing from sources:
 ````Shell
-git clone https://github.com/dhabyx/plasma-simpleMonitor.git plasma-simpleMonitor
+git clone https://github.com/wenyinos/plasma6-simpleMonitor.git
 cd plasma-simpleMonitor
 kpackagetool6 -t Plasma/Applet -i ./plasmoid
 ````
@@ -56,7 +58,7 @@ Packaging
 Simple way for make plasmoid package:
 
 ````Shell
-git clone https://github.com/dhabyx/plasma-simpleMonitor.git plasma-simpleMonitor
+git clone https://github.com/wenyinos/plasma6-simpleMonitor.git
 cd plasma-simpleMonitor/plasmoid
 zip -r plasma-simpleMonitor.plasmoid contents metadata.json
 ````

@@ -7,7 +7,7 @@
         "Icon": "simpleMonitor_icon",
         "Category": "System Information",
         "Version": "0.7",
-        "Website": "http://plasma.kde.org/",
+        "Website": "https://github.com/wenyinos/plasma6-simpleMonitor",
         "Authors": [
             {
                 "Name": "DhabyX",
@@ -16,6 +16,10 @@
             {
                 "Name": "Konstantin Shtepa",
                 "Email": "oss.konstantin.shtepa@yandex.ru"
+            },
+            {
+                "Name": "Wenyin Root",
+                "Email": "ruojiner@hotmail.com"
             }
         ],
         "License": "GPL-3.0",
