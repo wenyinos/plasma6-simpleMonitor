@@ -48,7 +48,6 @@ PlasmoidItem {
             if (key === "Cached")     { root.memCached  = parseInt(val) * 1024; continue }
             if (key === "SwapFree")   { root.swapFree   = parseInt(val) * 1024; continue }
             if (key === "SwapTotal")  { root.swapTotal  = parseInt(val) * 1024; continue }
-            if (key === "SwapUsed")   { root.swapUsed   = parseInt(val) * 1024; continue }
             if (key === "OS_NAME")    { confEngine.distroName = val; continue }
             if (key === "OS_ID")      { confEngine.distroId = val; continue }
             if (key === "OS_VERSION") { confEngine.distroVersion = val; continue }

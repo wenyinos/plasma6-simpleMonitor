@@ -6,7 +6,7 @@
         "Description": "Plasma Simple System Monitor",
         "Icon": "simpleMonitor_icon",
         "Category": "System Information",
-        "Version": "0.7",
+        "Version": "0.7.5",
         "Website": "https://github.com/wenyinos/plasma6-simpleMonitor",
         "Authors": [
             {
